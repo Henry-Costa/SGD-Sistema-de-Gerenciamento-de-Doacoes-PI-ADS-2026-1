@@ -1,5 +1,4 @@
 package classesCustomizadas;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,20 +10,27 @@ import java.util.Objects;
  * e mantém o histórico de doações recebidas.
  */
 public class Beneficiario {
+
     /** Nome completo do beneficiário. */
     private String nome;
-    /** CPF do beneficiário, utilizado como identificador único. */
+
+    /** CPF do beneficiário. Imutável após o cadastro (11 dígitos numéricos). */
     private final String cpf;
-    /** Número de telefone para contato. */
+
+    /** Telefone de contato com DDD (10 ou 11 dígitos numéricos). */
     private String telefone;
+
     /** Endereço residencial do beneficiário. */
     private String endereco;
-    /** Número de membros na família do beneficiário, utilizado para avaliação de elegibilidade. */
+
+    /** Quantidade de pessoas que compõem a família do beneficiário. */
     private int membrosFamilia;
-    /** Lista de doações recebidas pelo beneficiário, armazenando o valor e a data de cada doação. */
-    private List<Doacao> historicoDoacoes = new ArrayList<>();
-    /** Status de elegibilidade do beneficiário, indicando se ele está ativo e apto a receber doações. */
+
+    /** Indica se o beneficiário está ativo no programa da ONG. */
     private boolean ativo;
+
+    /** Lista interna de doações recebidas pelo beneficiário. */
+    private final List<Doacao> doacoesRecebidas = new ArrayList<>();
 
     /**
      * Construtor da classe Beneficiario.
@@ -47,7 +53,7 @@ public class Beneficiario {
         setMembrosFamilia(membrosFamilia);
         this.ativo = true;
     }
-
+    
     /**
      * Gets the nome.
      *
@@ -56,7 +62,7 @@ public class Beneficiario {
     public String getNome() {
         return nome;
     }
-
+    
     /**
      * Gets the cpf.
      *
@@ -65,7 +71,7 @@ public class Beneficiario {
     public String getCpf() {
         return cpf;
     }
-
+    
     /**
      * Gets the telefone.
      *
@@ -74,7 +80,7 @@ public class Beneficiario {
     public String getTelefone() {
         return telefone;
     }
-
+    
     /**
      * Gets the endereco.
      *
@@ -83,11 +89,11 @@ public class Beneficiario {
     public String getEndereco() {
         return endereco;
     }
-
+    
     /**
-     * Gets the membrosFamilia.
+     * Gets the membros familia.
      *
-     * @return the membrosFamilia
+     * @return the membros familia
      */
     public int getMembrosFamilia() {
         return membrosFamilia;
@@ -186,4 +192,200 @@ public class Beneficiario {
         this.ativo = ativo;
     }
 
+    /**
+     * Registra o recebimento de uma doação pelo beneficiário.
+     * Valida se o beneficiário está ativo e se a doação não é nula ou duplicada.
+     *
+     * @param doacao doação a ser registrada.
+     * @throws IllegalStateException    se o beneficiário estiver inativo.
+     * @throws IllegalArgumentException se a doação for nula.
+     */
+    public void registrarRecebimento(Doacao doacao) {
+        if (!ativo) {
+            throw new IllegalStateException("Beneficiário inativo.");
+        }
+        if (doacao == null) {
+            throw new IllegalArgumentException("Doação inválida.");
+        }
+        if (!doacoesRecebidas.contains(doacao)) {
+            doacoesRecebidas.add(doacao);
+        }
+    }
+
+    /**
+     * Ativa o beneficiário no programa da ONG.
+     */
+    public void ativar() {
+        this.ativo = true;
+    }
+
+    /**
+     * Desativa o beneficiário no programa da ONG.
+     * Beneficiários inativos não podem receber doações.
+     */
+    public void desativar() {
+        this.ativo = false;
+    }
+
+    /**
+     * Verifica se o beneficiário tem prioridade no recebimento de doações.
+     * Famílias com 4 ou mais membros são consideradas prioritárias.
+     *
+     * @return true se elegível à prioridade, false caso contrário.
+     */
+    public boolean isElegivelPrioridade() {
+        return membrosFamilia >= 4;
+    }
+
+    /**
+     * Remove todas as doações registradas para este beneficiário.
+     * Útil para reinício de ciclo de distribuição.
+     */
+    public void limparDoacoes() {
+        doacoesRecebidas.clear();
+    }
+
+    /**
+     * Calcula o total de dinheiro recebido em todas as doações.
+     *
+     * @return soma dos valores em reais.
+     */
+    public double calcularTotalDinheiro() {
+        return doacoesRecebidas.stream()
+                .mapToDouble(Doacao::getValorMonetario)
+                .sum();
+    }
+
+    /**
+     * Calcula o total de agasalhos recebidos em todas as doações.
+     *
+     * @return soma das quantidades de agasalhos.
+     */
+    public int calcularTotalAgasalhos() {
+        return doacoesRecebidas.stream()
+                .mapToInt(Doacao::getUnidadeAgasalho)
+                .sum();
+    }
+
+    /**
+     * Calcula o total de alimentos recebidos em todas as doações.
+     *
+     * @return soma do peso em kg de alimentos.
+     */
+    public double calcularTotalAlimentos() {
+        return doacoesRecebidas.stream()
+                .mapToDouble(Doacao::getKgAlimento)
+                .sum();
+    }
+
+    /**
+     * Calcula a média de dinheiro recebido por doação.
+     * Retorna 0 se não houver doações registradas.
+     *
+     * @return média em reais por doação.
+     */
+    public double getMediaDinheiroPorDoacao() {
+        if (doacoesRecebidas.isEmpty()) return 0;
+        return calcularTotalDinheiro() / doacoesRecebidas.size();
+    }
+
+    /**
+     * Exibe as informações resumidas do beneficiário no console.
+     */
+    public void mostrarInfo() {
+        System.out.println("Nome: " + nome);
+        System.out.println("CPF: " + cpf);
+        System.out.println("Status: " + (ativo ? "Ativo" : "Inativo"));
+        System.out.println("Membros família: " + membrosFamilia);
+        System.out.println("Total dinheiro: R$ " + calcularTotalDinheiro());
+        System.out.println("Total alimentos: " + calcularTotalAlimentos() + " kg");
+        System.out.println("Total agasalhos: " + calcularTotalAgasalhos());
+    }
+
+    /**
+     * Gera e retorna um relatório completo do beneficiário em formato de texto.
+     * Não imprime diretamente, permitindo uso flexível (console, arquivo, tela).
+     *
+     * @return String com o relatório formatado.
+     */
+    public String gerarRelatorio() {
+        return "----- BENEFICIÁRIO -----\n" +
+                "Nome: " + nome + "\n" +
+                "CPF: " + cpf + "\n" +
+                "Status: " + (ativo ? "Ativo" : "Inativo") + "\n" +
+                "Membros: " + membrosFamilia + "\n" +
+                "Total R$: " + calcularTotalDinheiro() + "\n";
+    }
+
+    /**
+     * Valida o CPF informado.
+     * Verifica formato, dígitos repetidos e dígitos verificadores.
+     *
+     * @param cpf CPF a ser validado (somente números).
+     * @return CPF validado.
+     * @throws IllegalArgumentException se o CPF for inválido.
+     */
+    private String validarCpf(String cpf) {
+        if (cpf == null || !cpf.matches("\\d{11}")) {
+            throw new IllegalArgumentException("CPF inválido.");
+        }
+
+        // Validação dos dígitos verificadores
+        int[] nums = cpf.chars().map(c -> c - '0').toArray();
+
+        int soma1 = 0;
+        for (int i = 0; i < 9; i++) soma1 += nums[i] * (10 - i);
+        int d1 = (soma1 * 10) % 11;
+        if (d1 == 10) d1 = 0;
+
+        int soma2 = 0;
+        for (int i = 0; i < 10; i++) soma2 += nums[i] * (11 - i);
+        int d2 = (soma2 * 10) % 11;
+        if (d2 == 10) d2 = 0;
+
+        if (d1 != nums[9] || d2 != nums[10]) {
+            throw new IllegalArgumentException("CPF inválido.");
+        }
+
+        return cpf;
+    }
+
+    /**
+     * Compara dois beneficiários pelo CPF.
+     * Dois beneficiários são iguais se possuírem o mesmo CPF.
+     *
+     * @param o objeto a comparar.
+     * @return true se os CPFs forem iguais.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Beneficiario)) return false;
+        Beneficiario that = (Beneficiario) o;
+        return cpf.equals(that.cpf);
+    }
+
+    /**
+     * Gera o hash code baseado no CPF do beneficiário.
+     *
+     * @return hash code.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(cpf);
+    }
+
+    /**
+     * Retorna uma representação resumida do beneficiário em texto.
+     *
+     * @return String com nome, CPF e status.
+     */
+    @Override
+    public String toString() {
+        return "Beneficiario{" +
+                "nome='" + nome + '\'' +
+                ", cpf='" + cpf + '\'' +
+                ", ativo=" + ativo +
+                '}';
+    }
 }
