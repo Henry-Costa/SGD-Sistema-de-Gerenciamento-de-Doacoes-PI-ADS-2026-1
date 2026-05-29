@@ -15,10 +15,13 @@ public class TelaCadastroUsuario extends TelaBase {
     private JPasswordField campoSenha;
 
     private JCheckBox checkAdmin;
+    
+    private Usuario usuarioLogado;
 
-    public TelaCadastroUsuario() {
+    public TelaCadastroUsuario(Usuario usuarioLogado) {
 
         super("Cadastro de Usuário");
+        this.usuarioLogado = usuarioLogado;
         
         inicializarComponentes();
     }
@@ -114,6 +117,6 @@ public class TelaCadastroUsuario extends TelaBase {
 
         dispose();
 
-        new TelaLogin().setVisible(true);
+        new TelaMenu(usuarioLogado).setVisible(true);
     }
 }

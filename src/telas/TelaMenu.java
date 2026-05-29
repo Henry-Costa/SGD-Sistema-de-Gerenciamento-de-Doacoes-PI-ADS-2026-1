@@ -15,7 +15,6 @@ import java.awt.*;
  * 
  * Usuários administradores possuem acesso
  * ao cadastro de novos usuários.
- * 
  */
 public class TelaMenu extends TelaBase {
 
@@ -28,7 +27,7 @@ public class TelaMenu extends TelaBase {
         super("SGD - Menu Principal");
 
         this.usuario = usuario;
-        
+
         inicializarComponentes();
     }
 
@@ -86,6 +85,25 @@ public class TelaMenu extends TelaBase {
         add(cargo);
 
         /*
+         * BOTÃO DOADORES
+         */
+
+        BotaoPadrao btnDoadores =
+                new BotaoPadrao("Doadores");
+
+        btnDoadores.setBounds(30, 250, 220, 40);
+
+        btnDoadores.addActionListener(e -> {
+
+            dispose();
+
+            new TelaDoadores(usuario).setVisible(true);
+
+        });
+
+        add(btnDoadores);
+
+        /*
          * BOTÃO CADASTRAR USUÁRIO
          */
 
@@ -96,7 +114,7 @@ public class TelaMenu extends TelaBase {
 
             btnCadastrarUsuario.setBounds(
                     30,
-                    250,
+                    310,
                     220,
                     40
             );
@@ -105,7 +123,8 @@ public class TelaMenu extends TelaBase {
 
                 dispose();
 
-                new TelaCadastroUsuario().setVisible(true);
+                new TelaCadastroUsuario(usuario)
+                        .setVisible(true);
 
             });
 
@@ -119,7 +138,7 @@ public class TelaMenu extends TelaBase {
         BotaoPadrao btnDeslogar =
                 new BotaoPadrao("Deslogar");
 
-        btnDeslogar.setBounds(30, 310, 220, 40);
+        btnDeslogar.setBounds(30, 370, 220, 40);
 
         btnDeslogar.addActionListener(e -> {
 

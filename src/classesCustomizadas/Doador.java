@@ -1,4 +1,5 @@
 package classesCustomizadas;
+import java.util.ArrayList;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -19,6 +20,8 @@ public class Doador {
 
     /** Documento do doador (CPF, RG, etc.) */
     private String documento;
+    
+    private static ArrayList<Doador> doadores = new ArrayList<>();
 
     /**
      * Construtor da classe Doador.
@@ -28,11 +31,19 @@ public class Doador {
      * @param telefone Telefone do doador
      * @param documento Documento de identificação
      */
-    public Doador(String nome, String email, String telefone, String documento) {
-        this.nome = nome;
-        this.email = email;
-        this.telefone = telefone;
-        this.documento = documento;
+    /**
+     * Construtor da classe Doador.
+     *
+     * @param nome Nome do doador
+     * @param email E-mail do doador
+     * @param telefone Telefone do doador
+     * @param documento Documento de identificação
+     */
+    public Doador(String nome,String email,String telefone,String documento) {
+        setNome(nome);
+        setEmail(email);
+        setTelefone(telefone);
+        setDocumento(documento);
     }
 
     /**
@@ -55,11 +66,19 @@ public class Doador {
     }
 
     /**
-     * Sets the nome.
+     * Define o nome do doador.
      *
-     * @param nome the new nome
+     * @param nome.
      */
     public void setNome(String nome) {
+
+        if(nome == null || nome.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Nome inválido."
+            );
+        }
+
         this.nome = nome;
     }
 
@@ -73,11 +92,21 @@ public class Doador {
     }
 
     /**
-     * Sets the email.
+     * Define o email do doador.
      *
-     * @param email the new email
+     * @param email.
      */
     public void setEmail(String email) {
+
+        if(email == null
+                || email.trim().isEmpty()
+                || !email.contains("@")) {
+
+            throw new IllegalArgumentException(
+                    "E-mail inválido."
+            );
+        }
+
         this.email = email;
     }
 
@@ -208,5 +237,84 @@ public class Doador {
         }
 
         return cnpj;
+    }
+    
+    /**
+     * Adiciona um doador à lista em memória
+     * (enquanto não existe banco de dados).
+     *
+     * @param doador Doador a ser cadastrado.
+     */
+    public static void cadastrarDoador(Doador doador) {
+
+        for(Doador d : doadores) {
+
+            /*
+             * VALIDA E-MAIL DUPLICADO
+             */
+
+            if(d.getEmail().equalsIgnoreCase(
+                    doador.getEmail())) {
+
+                throw new IllegalArgumentException(
+                        "E-mail já cadastrado."
+                );
+            }
+
+            /*
+             * VALIDA DOCUMENTO DUPLICADO
+             */
+
+            if(d.getDocumento().equals(
+                    doador.getDocumento())) {
+
+                throw new IllegalArgumentException(
+                        "CPF/CNPJ já cadastrado."
+                );
+            }
+        }
+
+        doadores.add(doador);
+    }
+    
+    /**
+     * Retorna a lista de doadores cadastrados.
+     *
+     * @return Lista de doadores.
+     */
+    public static ArrayList<Doador> listarDoadores() {
+
+        return doadores;
+    }
+    
+    /**
+     * Pesquisa doadores pelo nome.
+     *
+     * @param nome Nome pesquisado.
+     *
+     * @return Lista de doadores encontrados.
+     */
+    public static ArrayList<Doador> pesquisarPorNome(String nome) {
+
+        ArrayList<Doador> encontrados =
+                new ArrayList<>();
+
+        for(Doador doador : doadores) {
+
+            if(doador.getNome()
+                    .toLowerCase()
+                    .contains(nome.toLowerCase())) {
+
+                encontrados.add(doador);
+            }
+        }
+
+        return encontrados;
+    }
+    
+    @Override
+    public String toString() {
+
+        return nome + " - " + documento;
     }
 }
