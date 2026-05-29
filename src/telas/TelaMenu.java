@@ -34,6 +34,10 @@ public class TelaMenu extends TelaBase {
     @Override
     protected void inicializarComponentes() {
 
+        /*
+         * TÍTULO
+         */
+
         JLabel titulo = new JLabel("SGD");
 
         titulo.setBounds(30, 20, 300, 50);
@@ -56,11 +60,15 @@ public class TelaMenu extends TelaBase {
 
         add(subtitulo);
 
+        /*
+         * USUÁRIO LOGADO
+         */
+
         JLabel usuarioLogado = new JLabel(
                 "Usuário: " + usuario.getUsername()
         );
 
-        usuarioLogado.setBounds(30, 130, 300, 30);
+        usuarioLogado.setBounds(30, 130, 250, 30);
 
         usuarioLogado.setForeground(TEXTO);
 
@@ -68,21 +76,52 @@ public class TelaMenu extends TelaBase {
 
         add(usuarioLogado);
 
-        String tipoUsuario = usuario.isAdministrador()
-                ? "Administrador"
-                : "Usuário comum";
+        /*
+         * STATUS ADMINISTRADOR
+         */
 
-        JLabel cargo = new JLabel(
-                "Permissão: " + tipoUsuario
+        JLabel lblAdmin = new JLabel("Administrador");
+
+        lblAdmin.setBounds(30, 165, 150, 30);
+
+        lblAdmin.setForeground(TEXTO);
+
+        lblAdmin.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        add(lblAdmin);
+
+        JCheckBox checkAdmin = new JCheckBox();
+
+        checkAdmin.setBounds(170, 168, 30, 30);
+
+        checkAdmin.setSelected(usuario.isAdministrador());
+
+        checkAdmin.setEnabled(false);
+
+        checkAdmin.setBackground(FUNDO);
+
+        add(checkAdmin);
+
+        /*
+         * PAINEL DOS BOTÕES
+         */
+
+        JPanel painelMenu = new JPanel();
+
+        painelMenu.setLayout(null);
+
+        painelMenu.setBounds(30, 230, 520, 220);
+
+        painelMenu.setBackground(new Color(45, 45, 45));
+
+        painelMenu.setBorder(
+                BorderFactory.createLineBorder(
+                        new Color(70, 70, 70),
+                        2
+                )
         );
 
-        cargo.setBounds(30, 165, 300, 30);
-
-        cargo.setForeground(TEXTO);
-
-        cargo.setFont(new Font("Arial", Font.PLAIN, 18));
-
-        add(cargo);
+        add(painelMenu);
 
         /*
          * BOTÃO DOADORES
@@ -91,7 +130,7 @@ public class TelaMenu extends TelaBase {
         BotaoPadrao btnDoadores =
                 new BotaoPadrao("Doadores");
 
-        btnDoadores.setBounds(30, 250, 220, 40);
+        btnDoadores.setBounds(30, 30, 200, 40);
 
         btnDoadores.addActionListener(e -> {
 
@@ -101,7 +140,67 @@ public class TelaMenu extends TelaBase {
 
         });
 
-        add(btnDoadores);
+        painelMenu.add(btnDoadores);
+
+        /*
+         * BOTÃO BENEFICIÁRIOS
+         */
+
+        BotaoPadrao btnBeneficiarios =
+                new BotaoPadrao("Beneficiários");
+
+        btnBeneficiarios.setBounds(280, 30, 200, 40);
+
+        btnBeneficiarios.addActionListener(e -> {
+
+            dispose();
+
+            new TelaBeneficiarios(usuario)
+                    .setVisible(true);
+
+        });
+
+        painelMenu.add(btnBeneficiarios);
+
+        /*
+         * BOTÃO CAMPANHAS
+         */
+
+        BotaoPadrao btnCampanhas =
+                new BotaoPadrao("Campanhas");
+
+        btnCampanhas.setBounds(30, 100, 200, 40);
+
+        btnCampanhas.addActionListener(e -> {
+
+            dispose();
+
+            new TelaCampanhas(usuario)
+                    .setVisible(true);
+
+        });
+
+        painelMenu.add(btnCampanhas);
+
+        /*
+         * BOTÃO DOAÇÕES
+         */
+
+        BotaoPadrao btnDoacoes =
+                new BotaoPadrao("Doações");
+
+        btnDoacoes.setBounds(280, 100, 200, 40);
+
+        btnDoacoes.addActionListener(e -> {
+
+            dispose();
+
+            new TelaDoacoes(usuario)
+                    .setVisible(true);
+
+        });
+
+        painelMenu.add(btnDoacoes);
 
         /*
          * BOTÃO CADASTRAR USUÁRIO
@@ -113,9 +212,9 @@ public class TelaMenu extends TelaBase {
                     new BotaoPadrao("Cadastrar Usuário");
 
             btnCadastrarUsuario.setBounds(
-                    30,
-                    310,
-                    220,
+                    155,
+                    165,
+                    200,
                     40
             );
 
@@ -128,7 +227,7 @@ public class TelaMenu extends TelaBase {
 
             });
 
-            add(btnCadastrarUsuario);
+            painelMenu.add(btnCadastrarUsuario);
         }
 
         /*
@@ -138,7 +237,7 @@ public class TelaMenu extends TelaBase {
         BotaoPadrao btnDeslogar =
                 new BotaoPadrao("Deslogar");
 
-        btnDeslogar.setBounds(30, 370, 220, 40);
+        btnDeslogar.setBounds(700, 500, 150, 40);
 
         btnDeslogar.addActionListener(e -> {
 
