@@ -26,7 +26,12 @@ public class Campanha {
      */
     private boolean aceitaAlimento;
 
+    /**
+     * Doações listadas na campanha
+     */
     private List<Doacao> doacoes = new ArrayList<>();
+    
+    private static ArrayList<Campanha> campanhas = new ArrayList<>();
 
     /**
      * Construtor da campanha.
@@ -197,6 +202,67 @@ public class Campanha {
                 .sum();
     }
 
+    
+    /**
+     * Cadastra uma campanha na lista em memória(Enquanto não tem banco de dados).
+     *
+     * @param campanha Campanha cadastrada.
+     */
+    public static void cadastrarCampanha(
+            Campanha campanha
+    ) {
+
+        for(Campanha c : campanhas) {
+
+            if(c.getNome().equalsIgnoreCase(
+                    campanha.getNome())) {
+
+                throw new IllegalArgumentException(
+                        "Já existe uma campanha com esse nome."
+                );
+            }
+        }
+
+        campanhas.add(campanha);
+    }
+    
+    /**
+     * Retorna todas as campanhas cadastradas.
+     *
+     * @return Lista de campanhas.
+     */
+    public static ArrayList<Campanha>
+    listarCampanhas() {
+
+        return campanhas;
+    }
+    
+    /**
+     * Pesquisa campanhas pelo nome.
+     *
+     * @param nome Nome pesquisado.
+     *
+     * @return Lista encontrada.
+     */
+    public static ArrayList<Campanha>
+    pesquisarPorNome(String nome) {
+
+        ArrayList<Campanha> encontradas =
+                new ArrayList<>();
+
+        for(Campanha campanha : campanhas) {
+
+            if(campanha.getNome()
+                    .toLowerCase()
+                    .contains(nome.toLowerCase())) {
+
+                encontradas.add(campanha);
+            }
+        }
+
+        return encontradas;
+    }
+    
     /**
      * Retorna um resumo das informações da campanha.
      *
@@ -217,5 +283,11 @@ public class Campanha {
         System.out.println("Total dinheiro: R$ " + getTotalDinheiro());
         System.out.println("Total agasalhos: " + getTotalAgasalhos());
         System.out.println("Total alimentos: " + getTotalAlimentosKg() + " kg");
+    }
+    
+    @Override
+    public String toString() {
+
+        return nome;
     }
 }

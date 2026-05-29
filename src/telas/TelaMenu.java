@@ -84,6 +84,8 @@ public class TelaMenu extends TelaBase {
 
         add(cargo);
 
+        
+        
         /*
          * BOTÃO DOADORES
          */
@@ -91,7 +93,7 @@ public class TelaMenu extends TelaBase {
         BotaoPadrao btnDoadores =
                 new BotaoPadrao("Doadores");
 
-        btnDoadores.setBounds(30, 250, 220, 40);
+        btnDoadores.setBounds(30,250,220,40);
 
         btnDoadores.addActionListener(e -> {
 
@@ -103,32 +105,49 @@ public class TelaMenu extends TelaBase {
 
         add(btnDoadores);
         
+        
         /*
          * BOTÃO BENEFICIÁRIOS
          */
 
+
+        BotaoPadrao btnBeneficiarios =
+   	        new BotaoPadrao("Beneficiários");
+
+        btnBeneficiarios.setBounds(30,310,220,40);
+
+       btnBeneficiarios.addActionListener(e -> {
+
+            dispose();
+
+            new TelaBeneficiarios(usuario).setVisible(true);
+
+        });
+
+        add(btnBeneficiarios);
+        
+        
+        /*
+         * BOTÃO CAMPANHAS
+         */
+
         if(usuario.isAdministrador()) {
 
-        	BotaoPadrao btnBeneficiarios =
-        	        new BotaoPadrao("Beneficiários");
+        	BotaoPadrao btnCampanhas =
+        	        new BotaoPadrao("Campanhas");
 
-        	btnBeneficiarios.setBounds(
-                    30,
-                    310,
-                    220,
-                    40
-            );
+        	btnCampanhas.setBounds(30,370,220,40);
 
-        	btnBeneficiarios.addActionListener(e -> {
+        	btnCampanhas.addActionListener(e -> {
 
                 dispose();
 
-                new TelaCadastroBeneficiario(usuario)
+                new TelaCampanhas(usuario)
                         .setVisible(true);
 
             });
 
-            add(btnBeneficiarios);
+            add(btnCampanhas);
         }
 
         /*
@@ -140,12 +159,7 @@ public class TelaMenu extends TelaBase {
             BotaoPadrao btnCadastrarUsuario =
                     new BotaoPadrao("Cadastrar Usuário");
 
-            btnCadastrarUsuario.setBounds(
-                    30,
-                    310,
-                    220,
-                    40
-            );
+            btnCadastrarUsuario.setBounds(30,430,220,40);
 
             btnCadastrarUsuario.addActionListener(e -> {
 
@@ -166,7 +180,7 @@ public class TelaMenu extends TelaBase {
         BotaoPadrao btnDeslogar =
                 new BotaoPadrao("Deslogar");
 
-        btnDeslogar.setBounds(30, 370, 220, 40);
+        btnDeslogar.setBounds(30,490,220,40);
 
         btnDeslogar.addActionListener(e -> {
 
