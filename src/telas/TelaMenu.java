@@ -102,6 +102,34 @@ public class TelaMenu extends TelaBase {
         });
 
         add(btnDoadores);
+        
+        /*
+         * BOTÃO BENEFICIÁRIOS
+         */
+
+        if(usuario.isAdministrador()) {
+
+        	BotaoPadrao btnBeneficiarios =
+        	        new BotaoPadrao("Beneficiários");
+
+        	btnBeneficiarios.setBounds(
+                    30,
+                    310,
+                    220,
+                    40
+            );
+
+        	btnBeneficiarios.addActionListener(e -> {
+
+                dispose();
+
+                new TelaCadastroBeneficiario(usuario)
+                        .setVisible(true);
+
+            });
+
+            add(btnBeneficiarios);
+        }
 
         /*
          * BOTÃO CADASTRAR USUÁRIO

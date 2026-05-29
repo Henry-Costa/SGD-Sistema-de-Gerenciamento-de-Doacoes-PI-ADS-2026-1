@@ -31,6 +31,8 @@ public class Beneficiario {
 
     /** Lista interna de doações recebidas pelo beneficiário. */
     private final List<Doacao> doacoesRecebidas = new ArrayList<>();
+    
+    private static ArrayList<Beneficiario> beneficiarios = new ArrayList<>();
 
     /**
      * Construtor da classe Beneficiario.
@@ -348,6 +350,71 @@ public class Beneficiario {
         }
 
         return cpf;
+    }
+    
+    /**
+     * Cadastra um beneficiário na lista em memória(enquanto não tem o banco de dados).
+     *
+     * @param beneficiario Beneficiário a cadastrar.
+     */
+    public static void cadastrarBeneficiario(
+            Beneficiario beneficiario
+    ) {
+
+        for(Beneficiario b : beneficiarios) {
+
+            /*
+             * CPF DUPLICADO
+             */
+
+            if(b.getCpf().equals(
+                    beneficiario.getCpf())) {
+
+                throw new IllegalArgumentException(
+                        "CPF já cadastrado."
+                );
+            }
+        }
+
+        beneficiarios.add(beneficiario);
+    }
+    
+    /**
+     * Retorna todos os beneficiários cadastrados.
+     *
+     * @return Lista de beneficiários.
+     */
+    public static ArrayList<Beneficiario>
+    listarBeneficiarios() {
+
+        return beneficiarios;
+    }
+    
+    /**
+     * Pesquisa beneficiários pelo nome.
+     *
+     * @param nome.
+     *
+     * @return Lista de beneficiários encontrados.
+     */
+    public static ArrayList<Beneficiario>
+    pesquisarPorNome(String nome) {
+
+        ArrayList<Beneficiario> encontrados =
+                new ArrayList<>();
+
+        for(Beneficiario beneficiario
+                : beneficiarios) {
+
+            if(beneficiario.getNome()
+                    .toLowerCase()
+                    .contains(nome.toLowerCase())) {
+
+                encontrados.add(beneficiario);
+            }
+        }
+
+        return encontrados;
     }
 
     /**
