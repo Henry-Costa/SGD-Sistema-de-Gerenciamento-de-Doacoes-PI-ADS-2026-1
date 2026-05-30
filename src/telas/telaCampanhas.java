@@ -124,28 +124,30 @@ public class TelaCampanhas extends TelaBase {
          * BOTÃO CADASTRAR
          */
 
-        BotaoPadrao btnCadastrar =
+        if(usuario.isAdministrador()) {
+        	BotaoPadrao btnCadastrar =
                 new BotaoPadrao(
                         "Cadastrar Campanha"
-                );
-
-        btnCadastrar.setBounds(
-                30,
-                470,
-                240,
-                40
-        );
-
-        btnCadastrar.addActionListener(e -> {
-
-            dispose();
-
-            new TelaCadastroCampanha(usuario)
-                    .setVisible(true);
-
-        });
-
-        add(btnCadastrar);
+	                );
+	
+	        btnCadastrar.setBounds(
+	                30,
+	                470,
+	                240,
+	                40
+	        );
+	
+	        btnCadastrar.addActionListener(e -> {
+	
+	            dispose();
+	
+	            new TelaCadastroCampanha(usuario)
+	                    .setVisible(true);
+	
+	        });
+	
+	        add(btnCadastrar);
+        }
 
         /*
          * BOTÃO VOLTAR
