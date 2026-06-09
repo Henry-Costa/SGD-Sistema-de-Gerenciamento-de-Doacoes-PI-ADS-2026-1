@@ -1,6 +1,7 @@
 package classesCustomizadas;
 
-import java.util.ArrayList;
+import services.BD;
+import java.sql.SQLException;
 
 /**
  * Classe responsável por representar um usuário do sistema.
@@ -8,12 +9,6 @@ import java.util.ArrayList;
  * Os dados de username e senha são armazenados de forma criptografada utilizando deslocamento de caracteres.
  */
 public class Usuario {
-
-    /**
-     * Lista responsável por armazenar os usuários cadastrados
-     * temporariamente em memória.
-     */
-    private static ArrayList<Usuario> usuarios = new ArrayList<>();
 
     /**
      * Nome de usuário criptografado.
@@ -71,41 +66,141 @@ public class Usuario {
     }
 
     /**
-     * Realiza o cadastro de um usuário no sistema.
-     * 
-     * O usuário é armazenado temporariamente em memória.
+     * Realiza o cadastro de um usuário no sistema no banco de dados
      * 
      * @param usuario Usuário que será cadastrado.
      */
     public static void cadastrarUsuario(Usuario usuario) {
 
-        usuarios.add(usuario);
+        BD bd = new BD();
+
+        try {
+
+            if (bd.getConnection()) {
+
+                String sql =
+                        """
+                        INSERT INTO sgd.usuario
+                        (
+                            username,
+                            senha,
+                            administrador
+                        )
+                        VALUES
+                        (
+                            ?, ?, ?
+                        )
+                        """;
+
+                bd.st =
+                        bd.con.prepareStatement(sql);
+
+                bd.st.setString(
+                        1,
+                        usuario.username
+                );
+
+                bd.st.setString(
+                        2,
+                        usuario.senha
+                );
+
+                bd.st.setBoolean(
+                        3,
+                        usuario.administrador
+                );
+
+                bd.st.executeUpdate();
+            }
+
+        } catch(SQLException e) {
+
+            throw new RuntimeException(
+                    "Erro ao cadastrar usuário: "
+                            + e.getMessage()
+            );
+
+        } finally {
+
+            bd.close();
+        }
     }
 
     /**
      * Realiza a autenticação de um usuário.
      * 
-     * Os dados informados são criptografados antes da comparação.
+     * Os dados informados são descriptografados antes da comparação.
      * 
      * @param username Nome de usuário informado.
      * @param senha Senha informada.
      * 
      * @return Usuário autenticado ou null em caso de falha.
      */
-    public static Usuario autenticar(String username,
-                                     String senha) {
+    public static Usuario autenticar(
+            String username,
+            String senha
+    ) {
 
-        String usernameCripto = criptografar(username);
+        BD bd = new BD();
 
-        String senhaCripto = criptografar(senha);
+        try {
 
-        for (Usuario usuario : usuarios) {
+            if (bd.getConnection()) {
 
-            if (usuario.username.equals(usernameCripto)
-                    && usuario.senha.equals(senhaCripto)) {
+                String sql =
+                        """
+                        SELECT *
+                        FROM sgd.usuario
+                        WHERE username = ?
+                        AND senha = ?
+                        """;
 
-                return usuario;
+                bd.st =
+                        bd.con.prepareStatement(sql);
+
+                bd.st.setString(
+                        1,
+                        criptografar(username)
+                );
+
+                bd.st.setString(
+                        2,
+                        criptografar(senha)
+                );
+
+                bd.rs =
+                        bd.st.executeQuery();
+
+                if(bd.rs.next()) {
+
+                    return new Usuario(
+
+                            descriptografar(
+                                    bd.rs.getString(
+                                            "username"
+                                    )
+                            ),
+
+                            descriptografar(
+                                    bd.rs.getString(
+                                            "senha"
+                                    )
+                            ),
+
+                            bd.rs.getBoolean(
+                                    "administrador"
+                            )
+                    );
+                }
             }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
         }
 
         return null;

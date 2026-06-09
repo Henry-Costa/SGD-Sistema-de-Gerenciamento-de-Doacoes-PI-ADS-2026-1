@@ -1,6 +1,8 @@
 package classesCustomizadas;
 import java.util.ArrayList;
 import java.util.List;
+import services.BD;
+import java.sql.SQLException;
 
 /**
  * Representa uma campanha de doações.
@@ -8,6 +10,8 @@ import java.util.List;
  * dinheiro, agasalhos e alimentos.
  */
 public class Campanha {
+	/** ID da campanha no banco de dados */
+    private int id;
 
     /**
      * O nome da campanha
@@ -31,7 +35,6 @@ public class Campanha {
      */
     private List<Doacao> doacoes = new ArrayList<>();
     
-    private static ArrayList<Campanha> campanhas = new ArrayList<>();
 
     /**
      * Construtor da campanha.
@@ -55,6 +58,23 @@ public class Campanha {
         this.aceitaDinheiro = aceitaDinheiro;
         this.aceitaAgasalho = aceitaAgasalho;
         this.aceitaAlimento = aceitaAlimento;
+    }
+    
+    /**
+     * Gets the id.
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+    
+    /**
+     * Define o id do doador.
+     * 
+     * @param id
+     */
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**
@@ -204,7 +224,7 @@ public class Campanha {
 
     
     /**
-     * Cadastra uma campanha na lista em memória(Enquanto não tem banco de dados).
+     * Cadastra uma campanha no banco de dados.
      *
      * @param campanha Campanha cadastrada.
      */
@@ -212,18 +232,52 @@ public class Campanha {
             Campanha campanha
     ) {
 
-        for(Campanha c : campanhas) {
+        BD bd = new BD();
 
-            if(c.getNome().equalsIgnoreCase(
-                    campanha.getNome())) {
+        try {
 
-                throw new IllegalArgumentException(
-                        "Já existe uma campanha com esse nome."
-                );
-            }
+            bd.getConnection();
+
+            String sql =
+                    "INSERT INTO sgd.campanha " +
+                    "(nome_campanha, aceita_dinheiro, aceita_agasalho, aceita_alimento) " +
+                    "VALUES (?, ?, ?, ?)";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setString(
+                    1,
+                    campanha.getNome()
+            );
+
+            bd.st.setBoolean(
+                    2,
+                    campanha.isAceitaDinheiro()
+            );
+
+            bd.st.setBoolean(
+                    3,
+                    campanha.isAceitaAgasalho()
+            );
+
+            bd.st.setBoolean(
+                    4,
+                    campanha.isAceitaAlimento()
+            );
+
+            bd.st.executeUpdate();
+
+        } catch(SQLException e) {
+
+            throw new IllegalArgumentException(
+                    "Erro ao cadastrar campanha: "
+                            + e.getMessage()
+            );
+
+        } finally {
+
+            bd.close();
         }
-
-        campanhas.add(campanha);
     }
     
     /**
@@ -234,7 +288,64 @@ public class Campanha {
     public static ArrayList<Campanha>
     listarCampanhas() {
 
-        return campanhas;
+        ArrayList<Campanha> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT * " +
+                    "FROM sgd.campanha " +
+                    "WHERE ativa = true " +
+                    "ORDER BY nome_campanha";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.rs = bd.st.executeQuery();
+
+            while(bd.rs.next()) {
+
+                Campanha campanha =
+                        new Campanha(
+
+                                bd.rs.getString(
+                                        "nome_campanha"
+                                ),
+
+                                bd.rs.getBoolean(
+                                        "aceita_dinheiro"
+                                ),
+
+                                bd.rs.getBoolean(
+                                        "aceita_agasalho"
+                                ),
+
+                                bd.rs.getBoolean(
+                                        "aceita_alimento"
+                                )
+                        );
+                
+		                campanha.setId(
+		                	    bd.rs.getInt("id_campanha")
+		                	);
+
+                lista.add(campanha);
+            }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return lista;
     }
     
     /**
@@ -247,20 +358,65 @@ public class Campanha {
     public static ArrayList<Campanha>
     pesquisarPorNome(String nome) {
 
-        ArrayList<Campanha> encontradas =
+        ArrayList<Campanha> lista =
                 new ArrayList<>();
 
-        for(Campanha campanha : campanhas) {
+        BD bd = new BD();
 
-            if(campanha.getNome()
-                    .toLowerCase()
-                    .contains(nome.toLowerCase())) {
+        try {
 
-                encontradas.add(campanha);
+            bd.getConnection();
+
+            String sql =
+                    "SELECT * " +
+                    "FROM sgd.campanha " +
+                    "WHERE LOWER(nome_campanha) LIKE LOWER(?) " +
+                    "AND ativa = true";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setString(
+                    1,
+                    "%" + nome + "%"
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while(bd.rs.next()) {
+
+                lista.add(
+
+                        new Campanha(
+
+                                bd.rs.getString(
+                                        "nome_campanha"
+                                ),
+
+                                bd.rs.getBoolean(
+                                        "aceita_dinheiro"
+                                ),
+
+                                bd.rs.getBoolean(
+                                        "aceita_agasalho"
+                                ),
+
+                                bd.rs.getBoolean(
+                                        "aceita_alimento"
+                                )
+                        )
+                );
             }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
         }
 
-        return encontradas;
+        return lista;
     }
     
     /**

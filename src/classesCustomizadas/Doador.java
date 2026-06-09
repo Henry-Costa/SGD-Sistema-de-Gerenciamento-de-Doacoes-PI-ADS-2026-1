@@ -1,5 +1,7 @@
 package classesCustomizadas;
 import java.util.ArrayList;
+import services.BD;
+import java.sql.SQLException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -8,6 +10,8 @@ import java.util.ArrayList;
  * nome, e-mail, telefone e documento.
  */
 public class Doador {
+	/** ID do doador no banco de dados */
+    private int id;
 
     /** Nome do doador. */
     private String nome;
@@ -21,7 +25,6 @@ public class Doador {
     /** Documento do doador (CPF, RG, etc.) */
     private String documento;
     
-    private static ArrayList<Doador> doadores = new ArrayList<>();
 
     /**
      * Construtor da classe Doador.
@@ -56,6 +59,23 @@ public class Doador {
         System.out.println("CNPJ/CPF: " + documento);
     }
 
+    /**
+     * Gets the id.
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+    
+    /**
+     * Define o id do doador.
+     * 
+     * @param id
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+    
     /**
      * Gets the nome.
      *
@@ -127,9 +147,23 @@ public class Doador {
      * @throws IllegalArgumentException se o telefone for inválido.
      */
     public void setTelefone(String telefone) {
-        if (telefone == null || !telefone.matches("\\d{10,11}")) {
-            throw new IllegalArgumentException("Telefone inválido.");
+
+        if(telefone == null) {
+            throw new IllegalArgumentException(
+                    "Telefone inválido."
+            );
         }
+
+        telefone =
+                telefone.replaceAll("\\D", "");
+
+        if(!telefone.matches("\\d{10,11}")) {
+
+            throw new IllegalArgumentException(
+                    "Telefone inválido."
+            );
+        }
+
         this.telefone = telefone;
     }
 
@@ -240,41 +274,44 @@ public class Doador {
     }
     
     /**
-     * Adiciona um doador à lista em memória
-     * (enquanto não existe banco de dados).
+     * Adiciona um doador ao banco de dados
      *
      * @param doador Doador a ser cadastrado.
      */
     public static void cadastrarDoador(Doador doador) {
 
-        for(Doador d : doadores) {
+        BD bd = new BD();
 
-            /*
-             * VALIDA E-MAIL DUPLICADO
-             */
+        try {
 
-            if(d.getEmail().equalsIgnoreCase(
-                    doador.getEmail())) {
+            bd.getConnection();
 
-                throw new IllegalArgumentException(
-                        "E-mail já cadastrado."
-                );
-            }
+            String sql =
+                    "INSERT INTO sgd.doador " +
+                    "(nome, email, telefone, documento) " +
+                    "VALUES (?, ?, ?, ?)";
 
-            /*
-             * VALIDA DOCUMENTO DUPLICADO
-             */
+            bd.st = bd.con.prepareStatement(sql);
 
-            if(d.getDocumento().equals(
-                    doador.getDocumento())) {
+            bd.st.setString(1, doador.getNome());
+            bd.st.setString(2, doador.getEmail());
+            bd.st.setString(3, doador.getTelefone());
+            bd.st.setString(4, doador.getDocumento());
 
-                throw new IllegalArgumentException(
-                        "CPF/CNPJ já cadastrado."
-                );
-            }
+            bd.st.executeUpdate();
+
         }
+        catch(SQLException e) {
 
-        doadores.add(doador);
+            throw new IllegalArgumentException(
+                    "Erro ao cadastrar doador: "
+                            + e.getMessage()
+            );
+        }
+        finally {
+
+            bd.close();
+        }
     }
     
     /**
@@ -284,7 +321,53 @@ public class Doador {
      */
     public static ArrayList<Doador> listarDoadores() {
 
-        return doadores;
+        ArrayList<Doador> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT * FROM sgd.doador ORDER BY nome";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.rs = bd.st.executeQuery();
+
+            while(bd.rs.next()) {
+
+                Doador d = new Doador(
+
+                        bd.rs.getString("nome"),
+
+                        bd.rs.getString("email"),
+
+                        bd.rs.getString("telefone"),
+
+                        bd.rs.getString("documento")
+                );
+                
+                d.setId(
+                	    bd.rs.getInt("id_doador")
+                	);
+
+                lista.add(d);
+            }
+
+        }
+        catch(SQLException e) {
+
+            e.printStackTrace();
+        }
+        finally {
+
+            bd.close();
+        }
+
+        return lista;
     }
     
     /**
@@ -294,22 +377,58 @@ public class Doador {
      *
      * @return Lista de doadores encontrados.
      */
-    public static ArrayList<Doador> pesquisarPorNome(String nome) {
+    public static ArrayList<Doador> pesquisarPorNome(
+            String nome
+    ) {
 
-        ArrayList<Doador> encontrados =
+        ArrayList<Doador> lista =
                 new ArrayList<>();
 
-        for(Doador doador : doadores) {
+        BD bd = new BD();
 
-            if(doador.getNome()
-                    .toLowerCase()
-                    .contains(nome.toLowerCase())) {
+        try {
 
-                encontrados.add(doador);
+            bd.getConnection();
+
+            String sql =
+                    "SELECT * FROM sgd.doador " +
+                    "WHERE LOWER(nome) LIKE LOWER(?)";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setString(1,
+                    "%" + nome + "%");
+
+            bd.rs = bd.st.executeQuery();
+
+            while(bd.rs.next()) {
+
+                lista.add(
+
+                        new Doador(
+
+                                bd.rs.getString("nome"),
+
+                                bd.rs.getString("email"),
+
+                                bd.rs.getString("telefone"),
+
+                                bd.rs.getString("documento")
+                        )
+                );
             }
+
+        }
+        catch(SQLException e) {
+
+            e.printStackTrace();
+        }
+        finally {
+
+            bd.close();
         }
 
-        return encontrados;
+        return lista;
     }
     
     @Override

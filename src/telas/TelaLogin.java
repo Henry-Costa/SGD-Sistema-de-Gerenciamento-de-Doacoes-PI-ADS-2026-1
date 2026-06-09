@@ -89,49 +89,33 @@ public class TelaLogin extends TelaBase {
 
     private void realizarLogin() {
 
-        String usuarioDigitado = campoUsuario.getText();
+        String usuarioDigitado =
+                campoUsuario.getText();
 
-        String senhaDigitada = new String(campoSenha.getPassword());
+        String senhaDigitada =
+                new String(
+                        campoSenha.getPassword()
+                );
 
-        /*
-         * LOGIN ADMIN TEMPORÁRIO   Retirar quando tiver integração com banco de dados
-         */
-
-        if(usuarioDigitado.equals("adm")
-                && senhaDigitada.equals("123")) {
-
-            Usuario admin = new Usuario(
-                    "adm",
-                    "123",
-                    true
-            );
-
-            dispose();
-
-            new TelaMenu(admin).setVisible(true);
-
-            return;
-        }
-
-        /*
-         * LOGIN NORMAL
-         */
-
-        Usuario usuario = Usuario.autenticar(
-                usuarioDigitado,
-                senhaDigitada
-        );
+        Usuario usuario =
+                Usuario.autenticar(
+                        usuarioDigitado,
+                        senhaDigitada
+                );
 
         if(usuario != null) {
 
             dispose();
 
-            new TelaMenu(usuario).setVisible(true);
+            new TelaMenu(usuario)
+                    .setVisible(true);
 
         } else {
 
-            JOptionPane.showMessageDialog(this,
-                    "Usuário ou senha inválidos!");
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Usuário ou senha inválidos!"
+            );
         }
     }
 }
