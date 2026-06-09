@@ -19,12 +19,6 @@ public class Doacao {
     private int id;
 
     /**
-     * Lista em memória de doações.
-     */
-    private static ArrayList<Doacao> doacoes =
-            new ArrayList<>();
-
-    /**
      * Doador responsável.
      */
     private Doador doador;
@@ -536,6 +530,180 @@ public class Doacao {
         return lista;
     }
 
+    
+    /**
+     * Lista as doações de uma campanha.
+     *
+     * @param idCampanha id da campanha.
+     *
+     * @return Lista encontrada.
+     */
+    public static ArrayList<Doacao>
+    listarPorCampanha(
+            int idCampanha
+    ) {
+
+        ArrayList<Doacao> resultado =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                "SELECT d.*, " +
+                "doa.id_doador, doa.nome AS nome_doador, " +
+                "b.id_beneficiario, b.nome AS nome_beneficiario, " +
+                "c.id_campanha, c.nome_campanha " +
+                "FROM sgd.doacao d " +
+                "INNER JOIN sgd.doador doa " +
+                "ON d.id_doador = doa.id_doador " +
+                "INNER JOIN sgd.beneficiario b " +
+                "ON d.id_beneficiario = b.id_beneficiario " +
+                "INNER JOIN sgd.campanha c " +
+                "ON d.id_campanha = c.id_campanha " +
+                "WHERE d.id_campanha = ? " +
+                "ORDER BY d.data_doacao DESC";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setInt(
+                    1,
+                    idCampanha
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while(bd.rs.next()) {
+
+                Doador doador =
+                        new Doador(
+                                bd.rs.getString(
+                                        "nome_doador"
+                                ),
+                                "email@email.com",
+                                "00000000000",
+                                "12345678909"
+                        );
+
+                doador.setId(
+                        bd.rs.getInt(
+                                "id_doador"
+                        )
+                );
+
+                Beneficiario beneficiario =
+                        new Beneficiario(
+                                bd.rs.getString(
+                                        "nome_beneficiario"
+                                ),
+                                "52998224725",
+                                "00000000000",
+                                "Endereço",
+                                1
+                        );
+
+                beneficiario.setId(
+                        bd.rs.getInt(
+                                "id_beneficiario"
+                        )
+                );
+
+                Campanha campanha =
+                        new Campanha(
+                                bd.rs.getString(
+                                        "nome_campanha"
+                                ),
+                                true,
+                                true,
+                                true
+                        );
+
+                campanha.setId(
+                        bd.rs.getInt(
+                                "id_campanha"
+                        )
+                );
+
+                Doacao doacao;
+
+                String tipo =
+                        bd.rs.getString(
+                                "tipo_doacao"
+                        );
+
+                switch(tipo) {
+
+                    case "DINHEIRO":
+
+                        doacao =
+                                new Doacao(
+                                        doador,
+                                        beneficiario,
+                                        campanha,
+                                        bd.rs.getFloat(
+                                                "valor_monetario"
+                                        )
+                                );
+
+                        break;
+
+                    case "ALIMENTO":
+
+                        doacao =
+                                new Doacao(
+                                        doador,
+                                        beneficiario,
+                                        campanha,
+                                        bd.rs.getDouble(
+                                                "kg_alimento"
+                                        )
+                                );
+
+                        break;
+
+                    default:
+
+                        doacao =
+                                new Doacao(
+                                        doador,
+                                        beneficiario,
+                                        campanha,
+                                        bd.rs.getInt(
+                                                "unidade_agasalho"
+                                        )
+                                );
+                }
+
+                doacao.setId(
+                        bd.rs.getInt(
+                                "id_doacao"
+                        )
+                );
+
+                resultado.add(
+                        doacao
+                );
+            }
+
+        } catch(SQLException e) {
+
+            throw new IllegalArgumentException(
+                    "Erro ao listar doações: "
+                            + e.getMessage()
+            );
+
+        } finally {
+
+            bd.close();
+        }
+
+        return resultado;
+    }
+    
+    
     /**
      * Retorna o tipo da doação.
      *

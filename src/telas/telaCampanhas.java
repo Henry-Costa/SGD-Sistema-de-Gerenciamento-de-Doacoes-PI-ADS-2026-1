@@ -100,13 +100,79 @@ public class TelaCampanhas extends TelaBase {
 
         modeloTabela.addColumn("Nome");
 
-        modeloTabela.addColumn("Dinheiro");
+        modeloTabela.addColumn("Doações");
 
-        modeloTabela.addColumn("Agasalho");
+        modeloTabela.addColumn("Aceita Dinheiro");
 
-        modeloTabela.addColumn("Alimento");
+        modeloTabela.addColumn("Aceita Agasalho");
 
-        tabela = new JTable(modeloTabela);
+        modeloTabela.addColumn("Aceita Alimento");
+
+        modeloTabela.addColumn("Total R$");
+
+        modeloTabela.addColumn("Total Agasalhos");
+
+        modeloTabela.addColumn("Total Alimentos (Kg)");
+
+        tabela = new JTable(modeloTabela) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Class<?> getColumnClass(int column) {
+
+                switch(column) {
+
+                    case 2:
+                    case 3:
+                    case 4:
+                        return Boolean.class;
+
+                    default:
+                        return Object.class;
+                }
+            }
+
+            @Override
+            public boolean isCellEditable(
+                    int row,
+                    int column
+            ) {
+                return false;
+            }
+        };
+        
+        tabela.getColumnModel()
+        .getColumn(0)
+        .setPreferredWidth(220);
+
+        tabela.getColumnModel()
+        .getColumn(1)
+        .setPreferredWidth(60);
+
+  		tabela.getColumnModel()
+        .getColumn(2)
+        .setPreferredWidth(90);
+
+  		tabela.getColumnModel()
+        .getColumn(3)
+        .setPreferredWidth(90);
+
+  		tabela.getColumnModel()
+        .getColumn(4)
+        .setPreferredWidth(90);
+
+  		tabela.getColumnModel()
+        .getColumn(5)
+        .setPreferredWidth(120);
+
+  		tabela.getColumnModel()
+        .getColumn(6)
+        .setPreferredWidth(120);
+
+  		tabela.getColumnModel()
+        .getColumn(7)
+        .setPreferredWidth(140);
 
         JScrollPane scroll =
                 new JScrollPane(tabela);
@@ -119,6 +185,43 @@ public class TelaCampanhas extends TelaBase {
         );
 
         add(scroll);
+        
+        tabela.addMouseListener(
+                new java.awt.event.MouseAdapter() {
+
+                    @Override
+                    public void mouseClicked(
+                            java.awt.event.MouseEvent e
+                    ) {
+
+                        if(e.getClickCount() == 2) {
+
+                            int linha =
+                                    tabela.getSelectedRow();
+
+                            if(linha >= 0) {
+
+                                String nomeCampanha =
+                                        tabela.getValueAt(
+                                                linha,
+                                                0
+                                        ).toString();
+
+                                Campanha campanha =
+                                        Campanha
+                                                .buscarPorNomeExato(
+                                                        nomeCampanha
+                                                );
+
+                                new TelaDetalhesCampanha(
+                                        usuario,
+                                        campanha
+                                ).setVisible(true);
+                            }
+                        }
+                    }
+                }
+        );
 
         /*
          * BOTÃO CADASTRAR
@@ -190,19 +293,24 @@ public class TelaCampanhas extends TelaBase {
 
             modeloTabela.addRow(new Object[] {
 
-                    campanha.getNome(),
+                campanha.getNome(),
 
-                    campanha.isAceitaDinheiro()
-                            ? "Sim"
-                            : "Não",
+                campanha.getQuantidadeDoacoes(),
 
-                    campanha.isAceitaAgasalho()
-                            ? "Sim"
-                            : "Não",
+                campanha.isAceitaDinheiro(),
 
-                    campanha.isAceitaAlimento()
-                            ? "Sim"
-                            : "Não"
+                campanha.isAceitaAgasalho(),
+
+                campanha.isAceitaAlimento(),
+
+                String.format(
+                        "R$ %.2f",
+                        campanha.getTotalDinheiro()
+                ),
+
+                campanha.getTotalAgasalhos(),
+
+                campanha.getTotalAlimentosKg()
             });
         }
     }

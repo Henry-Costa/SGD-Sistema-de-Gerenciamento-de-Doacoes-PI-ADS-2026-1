@@ -33,7 +33,7 @@ public class TelaCadastroUsuario extends TelaBase {
 
         painel.setLayout(null);
 
-        painel.setBounds(250, 120, 400, 320);
+        painel.setBounds(250,100,400,380);
 
         painel.setBackground(PAINEL);
 
@@ -75,9 +75,22 @@ public class TelaCadastroUsuario extends TelaBase {
 
         BotaoPadrao btnCadastrar = new BotaoPadrao("Cadastrar");
 
-        btnCadastrar.setBounds(120, 270, 150, 35);
+        btnCadastrar.setBounds(120,270,150,35);
 
         btnCadastrar.addActionListener(e -> cadastrarUsuario());
+        
+        BotaoPadrao btnVoltar = new BotaoPadrao("Voltar");
+
+        btnVoltar.setBounds(120,315,150,35);
+
+        btnVoltar.addActionListener(e -> {
+
+            dispose();
+
+            new TelaMenu(usuarioLogado)
+                    .setVisible(true);
+        });
+        
 
         painel.add(titulo);
 
@@ -92,6 +105,8 @@ public class TelaCadastroUsuario extends TelaBase {
         painel.add(checkAdmin);
 
         painel.add(btnCadastrar);
+        
+        painel.add(btnVoltar);
 
         add(painel);
     }
