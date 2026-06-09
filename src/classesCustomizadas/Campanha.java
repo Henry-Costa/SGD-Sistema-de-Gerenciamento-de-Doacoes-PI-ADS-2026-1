@@ -148,7 +148,50 @@ public class Campanha {
     public boolean isAceitaAlimento() {
         return aceitaAlimento;
     }
+    
+    /**
+     * Busca a quantidade de doações relacionadas a campanha atual
+     * @return quantidade de doações da campanha
+     */
+    public int getQuantidadeDoacoes() {
 
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                "SELECT COUNT(*) " +
+                "FROM sgd.doacao " +
+                "WHERE id_campanha = ?";
+
+            bd.st =
+                bd.con.prepareStatement(sql);
+
+            bd.st.setInt(1, id);
+
+            bd.rs = bd.st.executeQuery();
+
+            if(bd.rs.next()) {
+
+                return bd.rs.getInt(1);
+            }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return 0;
+    }
+
+    
+    
     /**
      * Adiciona uma doação à campanha se o tipo da doação for válido.
      *
@@ -195,9 +238,40 @@ public class Campanha {
      * @return soma total em dinheiro
      */
     public double getTotalDinheiro() {
-        return doacoes.stream()
-                .mapToDouble(Doacao::getValorMonetario)
-                .sum();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                "SELECT COALESCE(SUM(valor_monetario),0) " +
+                "FROM sgd.doacao " +
+                "WHERE id_campanha = ?";
+
+            bd.st =
+                bd.con.prepareStatement(sql);
+
+            bd.st.setInt(1, id);
+
+            bd.rs = bd.st.executeQuery();
+
+            if(bd.rs.next()) {
+
+                return bd.rs.getDouble(1);
+            }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return 0;
     }
 
     /**
@@ -206,9 +280,39 @@ public class Campanha {
      * @return quantidade total de agasalhos
      */
     public int getTotalAgasalhos() {
-        return doacoes.stream()
-                .mapToInt(Doacao::getUnidadeAgasalho)
-                .sum();
+    	BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                "SELECT COALESCE(SUM(unidade_agasalho),0) " +
+                "FROM sgd.doacao " +
+                "WHERE id_campanha = ?";
+
+            bd.st =
+                bd.con.prepareStatement(sql);
+
+            bd.st.setInt(1, id);
+
+            bd.rs = bd.st.executeQuery();
+
+            if(bd.rs.next()) {
+
+                return bd.rs.getInt(1);
+            }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return 0;
     }
 
     /**
@@ -217,11 +321,63 @@ public class Campanha {
      * @return total em quilogramas
      */
     public double getTotalAlimentosKg() {
-        return doacoes.stream()
-                .mapToDouble(Doacao::getKgAlimento)
-                .sum();
+    	BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                "SELECT COALESCE(SUM(kg_alimento),0) " +
+                "FROM sgd.doacao " +
+                "WHERE id_campanha = ?";
+
+            bd.st =
+                bd.con.prepareStatement(sql);
+
+            bd.st.setInt(1, id);
+
+            bd.rs = bd.st.executeQuery();
+
+            if(bd.rs.next()) {
+
+                return bd.rs.getDouble(1);
+            }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return 0;
     }
 
+    /**
+     * Busca uma campanha pelo nome exato.
+     *
+     * @param nome Nome da campanha.
+     * @return Campanha encontrada ou null.
+     */
+    public static Campanha buscarPorNomeExato(
+            String nome
+    ) {
+
+        for(Campanha campanha
+                : listarCampanhas()) {
+
+            if(campanha.getNome()
+                    .equals(nome)) {
+
+                return campanha;
+            }
+        }
+
+        return null;
+    }
     
     /**
      * Cadastra uma campanha no banco de dados.
