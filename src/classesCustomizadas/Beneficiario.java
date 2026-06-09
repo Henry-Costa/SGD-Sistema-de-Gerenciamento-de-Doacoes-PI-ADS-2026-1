@@ -1,7 +1,9 @@
 package classesCustomizadas;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import services.BD;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -10,6 +12,9 @@ import java.util.Objects;
  * e mantém o histórico de doações recebidas.
  */
 public class Beneficiario {
+	
+	/** ID do beneficiario no banco de dados */
+    private int id;
 
     /** Nome completo do beneficiário. */
     private String nome;
@@ -32,7 +37,6 @@ public class Beneficiario {
     /** Lista interna de doações recebidas pelo beneficiário. */
     private final List<Doacao> doacoesRecebidas = new ArrayList<>();
     
-    private static ArrayList<Beneficiario> beneficiarios = new ArrayList<>();
 
     /**
      * Construtor da classe Beneficiario.
@@ -54,6 +58,23 @@ public class Beneficiario {
         setEndereco(endereco);
         setMembrosFamilia(membrosFamilia);
         this.ativo = true;
+    }
+    
+    /**
+     * Gets the id.
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+    
+    /**
+     * Define o id do doador.
+     * 
+     * @param id
+     */
+    public void setId(int id) {
+        this.id = id;
     }
     
     /**
@@ -151,9 +172,23 @@ public class Beneficiario {
      * @throws IllegalArgumentException se o telefone for inválido.
      */
     public void setTelefone(String telefone) {
-        if (telefone == null || !telefone.matches("\\d{10,11}")) {
-            throw new IllegalArgumentException("Telefone inválido.");
+
+        if(telefone == null) {
+            throw new IllegalArgumentException(
+                    "Telefone inválido."
+            );
         }
+
+        telefone =
+                telefone.replaceAll("\\D", "");
+
+        if(!telefone.matches("\\d{10,11}")) {
+
+            throw new IllegalArgumentException(
+                    "Telefone inválido."
+            );
+        }
+
         this.telefone = telefone;
     }
 
@@ -353,7 +388,7 @@ public class Beneficiario {
     }
     
     /**
-     * Cadastra um beneficiário na lista em memória(enquanto não tem o banco de dados).
+     * Cadastra um beneficiário no banco de dados.
      *
      * @param beneficiario Beneficiário a cadastrar.
      */
@@ -361,22 +396,40 @@ public class Beneficiario {
             Beneficiario beneficiario
     ) {
 
-        for(Beneficiario b : beneficiarios) {
+        BD bd = new BD();
 
-            /*
-             * CPF DUPLICADO
-             */
+        try {
 
-            if(b.getCpf().equals(
-                    beneficiario.getCpf())) {
+            bd.getConnection();
 
-                throw new IllegalArgumentException(
-                        "CPF já cadastrado."
-                );
-            }
+            String sql =
+                    "INSERT INTO sgd.beneficiario " +
+                    "(nome, cpf, telefone, endereco, membros_familia, ativo) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setString(1, beneficiario.getNome());
+            bd.st.setString(2, beneficiario.getCpf());
+            bd.st.setString(3, beneficiario.getTelefone());
+            bd.st.setString(4, beneficiario.getEndereco());
+            bd.st.setInt(5, beneficiario.getMembrosFamilia());
+            bd.st.setBoolean(6, beneficiario.isAtivo());
+
+            bd.st.executeUpdate();
+
         }
+        catch(SQLException e) {
 
-        beneficiarios.add(beneficiario);
+            throw new IllegalArgumentException(
+                    "Erro ao cadastrar beneficiário: "
+                            + e.getMessage()
+            );
+        }
+        finally {
+
+            bd.close();
+        }
     }
     
     /**
@@ -387,7 +440,61 @@ public class Beneficiario {
     public static ArrayList<Beneficiario>
     listarBeneficiarios() {
 
-        return beneficiarios;
+        ArrayList<Beneficiario> lista =
+                new ArrayList<>();
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT * FROM sgd.beneficiario " +
+                    "ORDER BY nome";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.rs = bd.st.executeQuery();
+
+            while(bd.rs.next()) {
+
+                Beneficiario b =
+                        new Beneficiario(
+
+                                bd.rs.getString("nome"),
+
+                                bd.rs.getString("cpf"),
+
+                                bd.rs.getString("telefone"),
+
+                                bd.rs.getString("endereco"),
+
+                                bd.rs.getInt("membros_familia")
+                        );
+
+                b.setAtivo(
+                        bd.rs.getBoolean("ativo")
+                );
+                
+                b.setId(
+                	    bd.rs.getInt("id_beneficiario")
+                	);
+
+                lista.add(b);
+            }
+
+        }
+        catch(SQLException e) {
+
+            e.printStackTrace();
+        }
+        finally {
+
+            bd.close();
+        }
+
+        return lista;
     }
     
     /**
@@ -400,21 +507,66 @@ public class Beneficiario {
     public static ArrayList<Beneficiario>
     pesquisarPorNome(String nome) {
 
-        ArrayList<Beneficiario> encontrados =
+        ArrayList<Beneficiario> lista =
                 new ArrayList<>();
 
-        for(Beneficiario beneficiario
-                : beneficiarios) {
+        BD bd = new BD();
 
-            if(beneficiario.getNome()
-                    .toLowerCase()
-                    .contains(nome.toLowerCase())) {
+        try {
 
-                encontrados.add(beneficiario);
+            bd.getConnection();
+
+            String sql =
+                    "SELECT * FROM sgd.beneficiario " +
+                    "WHERE LOWER(nome) LIKE LOWER(?)";
+
+            bd.st = bd.con.prepareStatement(sql);
+
+            bd.st.setString(
+                    1,
+                    "%" + nome + "%"
+            );
+
+            bd.rs = bd.st.executeQuery();
+
+            while(bd.rs.next()) {
+
+                Beneficiario b =
+                        new Beneficiario(
+
+                                bd.rs.getString("nome"),
+
+                                bd.rs.getString("cpf"),
+
+                                bd.rs.getString("telefone"),
+
+                                bd.rs.getString("endereco"),
+
+                                bd.rs.getInt("membros_familia")
+                        );
+
+                b.setAtivo(
+                        bd.rs.getBoolean("ativo")
+                );
+                
+                b.setId(
+                	    bd.rs.getInt("id_beneficiario")
+                	);
+
+                lista.add(b);
             }
+
+        }
+        catch(SQLException e) {
+
+            e.printStackTrace();
+        }
+        finally {
+
+            bd.close();
         }
 
-        return encontrados;
+        return lista;
     }
 
     /**
@@ -449,10 +601,7 @@ public class Beneficiario {
      */
     @Override
     public String toString() {
-        return "Beneficiario{" +
-                "nome='" + nome + '\'' +
-                ", cpf='" + cpf + '\'' +
-                ", ativo=" + ativo +
-                '}';
+
+        return nome + " - " + cpf;
     }
 }
