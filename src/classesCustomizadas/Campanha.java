@@ -29,6 +29,11 @@ public class Campanha {
      * Se a campanha aceita doações de kgs alimento
      */
     private boolean aceitaAlimento;
+    
+    /**
+     * Se a campanha está ativa
+     */
+    private boolean ativa = true;
 
     /**
      * Doações listadas na campanha
@@ -58,6 +63,14 @@ public class Campanha {
         this.aceitaDinheiro = aceitaDinheiro;
         this.aceitaAgasalho = aceitaAgasalho;
         this.aceitaAlimento = aceitaAlimento;
+    }
+    
+    public boolean isAtiva() {
+        return ativa;
+    }
+
+    public void setAtiva(boolean ativa) {
+        this.ativa = ativa;
     }
     
     /**
@@ -485,6 +498,10 @@ public class Campanha {
                                 )
                         );
                 
+		                campanha.setAtiva(
+		                	    bd.rs.getBoolean("ativa")
+		                	);
+                
 		                campanha.setId(
 		                	    bd.rs.getInt("id_campanha")
 		                	);
@@ -573,6 +590,65 @@ public class Campanha {
         }
 
         return lista;
+    }
+    
+    public void atualizarCampanha() {
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                "UPDATE sgd.campanha " +
+                "SET ativa = ?, " +
+                "aceita_dinheiro = ?, " +
+                "aceita_agasalho = ?, " +
+                "aceita_alimento = ? " +
+                "WHERE id_campanha = ?";
+
+            bd.st =
+                bd.con.prepareStatement(sql);
+
+            bd.st.setBoolean(
+                    1,
+                    isAtiva()
+            );
+
+            bd.st.setBoolean(
+                    2,
+                    isAceitaDinheiro()
+            );
+
+            bd.st.setBoolean(
+                    3,
+                    isAceitaAgasalho()
+            );
+
+            bd.st.setBoolean(
+                    4,
+                    isAceitaAlimento()
+            );
+
+            bd.st.setInt(
+                    5,
+                    getId()
+            );
+
+            bd.st.executeUpdate();
+        }
+        catch(SQLException e) {
+
+            throw new IllegalArgumentException(
+                    "Erro ao atualizar campanha: "
+                    + e.getMessage()
+            );
+        }
+        finally {
+
+            bd.close();
+        }
     }
     
     /**

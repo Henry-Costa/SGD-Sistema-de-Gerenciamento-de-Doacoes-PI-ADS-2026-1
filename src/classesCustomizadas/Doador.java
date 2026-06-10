@@ -274,6 +274,108 @@ public class Doador {
     }
     
     /**
+     * Atualiza dados de um doador
+     * @param doador Doador a ser atualizado
+     */
+    public static void atualizarDoador(
+            Doador doador
+    ) {
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "UPDATE sgd.doador " +
+                    "SET nome = ?, " +
+                    "email = ?, " +
+                    "telefone = ? " +
+                    "WHERE id_doador = ?";
+
+            bd.st =
+                    bd.con.prepareStatement(sql);
+
+            bd.st.setString(
+                    1,
+                    doador.getNome()
+            );
+
+            bd.st.setString(
+                    2,
+                    doador.getEmail()
+            );
+
+            bd.st.setString(
+                    3,
+                    doador.getTelefone()
+            );
+
+            bd.st.setInt(
+                    4,
+                    doador.getId()
+            );
+
+            bd.st.executeUpdate();
+
+        }
+        catch(SQLException e) {
+
+            throw new IllegalArgumentException(
+                    "Erro ao atualizar doador: "
+                            + e.getMessage()
+            );
+        }
+        finally {
+
+            bd.close();
+        }
+    }
+    
+    /**
+     * Exclui um doador do banco de dados por id
+     * @param id ID do daodor a ser excluído
+     */
+    public static void excluirDoador(
+            int id
+    ) {
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "DELETE FROM sgd.doador " +
+                    "WHERE id_doador = ?";
+
+            bd.st =
+                    bd.con.prepareStatement(sql);
+
+            bd.st.setInt(
+                    1,
+                    id
+            );
+
+            bd.st.executeUpdate();
+
+        }
+        catch(SQLException e) {
+
+            throw new IllegalArgumentException(
+                    "Não foi possível excluir o doador.\n"
+                    + "Verifique se existem doações vinculadas."
+            );
+        }
+        finally {
+
+            bd.close();
+        }
+    }
+    
+    /**
      * Adiciona um doador ao banco de dados
      *
      * @param doador Doador a ser cadastrado.
@@ -368,6 +470,80 @@ public class Doador {
         }
 
         return lista;
+    }
+    
+    /**
+     * Pesquisa doador por documento
+     * @param documento
+     * @return Doador com documento correspondente
+     */
+    public static Doador buscarPorDocumento(
+            String documento
+    ) {
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                "SELECT * " +
+                "FROM sgd.doador " +
+                "WHERE documento = ?";
+
+            bd.st =
+                bd.con.prepareStatement(sql);
+
+            bd.st.setString(
+                    1,
+                    documento
+            );
+
+            bd.rs =
+                bd.st.executeQuery();
+
+            if(bd.rs.next()) {
+
+                Doador doador =
+                        new Doador(
+
+                                bd.rs.getString(
+                                        "nome"
+                                ),
+
+                                bd.rs.getString(
+                                        "email"
+                                ),
+
+                                bd.rs.getString(
+                                        "telefone"
+                                ),
+
+                                bd.rs.getString(
+                                        "documento"
+                                )
+                        );
+
+                doador.setId(
+                        bd.rs.getInt(
+                                "id_doador"
+                        )
+                );
+
+                return doador;
+            }
+
+        } catch(SQLException e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            bd.close();
+        }
+
+        return null;
     }
     
     /**
