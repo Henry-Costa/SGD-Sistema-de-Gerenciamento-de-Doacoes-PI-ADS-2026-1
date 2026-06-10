@@ -203,6 +203,43 @@ public class TelaMenu extends TelaBase {
         painelMenu.add(btnDoacoes);
 
         /*
+         * BOTÃO RELATÓRIOS
+         */
+
+        BotaoPadrao btnRelatorios =
+                new BotaoPadrao("Relatórios");
+
+        if(usuario.isAdministrador()) {
+
+            btnRelatorios.setBounds(
+                    30,
+                    165,
+                    200,
+                    40
+            );
+
+        } else {
+
+            btnRelatorios.setBounds(
+                    155,
+                    165,
+                    200,
+                    40
+            );
+        }
+
+        btnRelatorios.addActionListener(e -> {
+
+            dispose();
+
+            new TelaRelatorios(usuario)
+                    .setVisible(true);
+
+        });
+
+        painelMenu.add(btnRelatorios);
+        
+        /*
          * BOTÃO USUÁRIOS
          */
 
@@ -212,7 +249,7 @@ public class TelaMenu extends TelaBase {
                     new BotaoPadrao("Usuários");
 
             btnUsuarios.setBounds(
-                    155,
+                    280,
                     165,
                     200,
                     40
