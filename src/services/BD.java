@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Classe responsável por fazer a conexão e gerenciar o banco de dados
+ */
 public class BD{
 	public Connection con = null;
 	public ResultSet rs = null;

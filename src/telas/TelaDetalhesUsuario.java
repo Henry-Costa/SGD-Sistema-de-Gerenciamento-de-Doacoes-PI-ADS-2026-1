@@ -7,6 +7,9 @@ import classesCustomizadas.Usuario;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Tela de detalhes de um usuário para visualização, edição e remoção caso o usuário atual tenha permissão de administrador
+ */
 public class TelaDetalhesUsuario
         extends TelaBase {
 

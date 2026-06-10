@@ -8,6 +8,9 @@ import classesCustomizadas.Usuario;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Tela de cadastro de um usuário no banco de dados
+ */
 public class TelaCadastroUsuario extends TelaBase {
 
     private CampoTextoPadrao campoUsuario;

@@ -11,6 +11,9 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 
+/**
+ * Tela de detalhes de uma campanha para visualização, edição e remoção caso o usuário atual tenha permissão de administrador
+ */
 public class TelaDetalhesCampanha
         extends TelaBase {
 

@@ -1,5 +1,8 @@
 package classesCustomizadas;
 
+/**
+ * Classe com as queries e visualizações dos relatórios do banco de dados
+ */
 import services.BD;
 
 import javax.swing.table.DefaultTableModel;

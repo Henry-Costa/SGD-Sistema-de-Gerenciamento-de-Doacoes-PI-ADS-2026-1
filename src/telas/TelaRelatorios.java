@@ -9,6 +9,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
+/**
+ * Tela de visualização de relatórios baseados no banco de dados
+ */
 public class TelaRelatorios extends TelaBase {
 
     private static final long serialVersionUID = 1L;

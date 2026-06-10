@@ -9,6 +9,9 @@ import classesCustomizadas.Usuario;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Tela de detalhes de um beneficiário para visualização, edição e remoção caso o usuário atual tenha permissão de administrador
+ */
 public class TelaDetalhesBeneficiario
         extends TelaBase {
 

@@ -11,6 +11,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Tela responsável pelo gerenciamento dos usuários no sistema.
+ */
 public class TelaUsuarios extends TelaBase {
 
     private static final long serialVersionUID = 1L;

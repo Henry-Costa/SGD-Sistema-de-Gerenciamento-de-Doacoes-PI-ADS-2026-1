@@ -3,6 +3,9 @@ package componentes;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Classe de campo de texto genérico com o estilo gráfico do sistema já aplicado
+ */
 public class CampoTextoPadrao extends JTextField {
 
     public CampoTextoPadrao() {
