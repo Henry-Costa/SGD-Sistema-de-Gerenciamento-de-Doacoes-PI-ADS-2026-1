@@ -92,7 +92,18 @@ public class TelaBeneficiarios extends TelaBase {
          * TABELA
          */
 
-        modeloTabela = new DefaultTableModel();
+        modeloTabela = new DefaultTableModel() {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(
+                    int row,
+                    int column
+            ) {
+                return false;
+            }
+        };
 
         modeloTabela.addColumn("Nome");
 
@@ -105,7 +116,46 @@ public class TelaBeneficiarios extends TelaBase {
         modeloTabela.addColumn("Status");
 
         tabela = new JTable(modeloTabela);
+        
+        tabela.addMouseListener(
+        	    new java.awt.event.MouseAdapter() {
 
+        	        @Override
+        	        public void mouseClicked(
+        	                java.awt.event.MouseEvent e
+        	        ) {
+
+        	            if(e.getClickCount() == 2) {
+
+        	                int linha =
+        	                        tabela.getSelectedRow();
+
+        	                if(linha >= 0) {
+
+        	                    String cpf =
+        	                            tabela.getValueAt(
+        	                                    linha,
+        	                                    1
+        	                            ).toString();
+
+        	                    Beneficiario beneficiario =
+        	                            Beneficiario.buscarPorCpf(
+        	                                    cpf
+        	                            );
+
+        	                    if(beneficiario != null) {
+
+        	                        new TelaDetalhesBeneficiario(
+        	                                usuario,
+        	                                beneficiario
+        	                        ).setVisible(true);
+        	                    }
+        	                }
+        	            }
+        	        }
+        	    }
+        	);
+        
         JScrollPane scroll =
                 new JScrollPane(tabela);
 

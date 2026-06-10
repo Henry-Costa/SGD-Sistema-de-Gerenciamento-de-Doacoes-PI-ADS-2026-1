@@ -230,6 +230,74 @@ public class Beneficiario {
     }
 
     /**
+     * Busca um beneficiário por cpf
+     * @param cpf Cpf a ser pesquisado
+     * @return Beneficiário com o cpf especificado
+     */
+    public static Beneficiario buscarPorCpf(
+            String cpf
+    ) {
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "SELECT * " +
+                    "FROM sgd.beneficiario " +
+                    "WHERE cpf = ?";
+
+            bd.st =
+                    bd.con.prepareStatement(sql);
+
+            bd.st.setString(
+                    1,
+                    cpf
+            );
+
+            bd.rs =
+                    bd.st.executeQuery();
+
+            if(bd.rs.next()) {
+
+                Beneficiario b =
+                        new Beneficiario(
+                                bd.rs.getString("nome"),
+                                bd.rs.getString("cpf"),
+                                bd.rs.getString("telefone"),
+                                bd.rs.getString("endereco"),
+                                bd.rs.getInt("membros_familia")
+                        );
+
+                b.setId(
+                        bd.rs.getInt("id_beneficiario")
+                );
+
+                b.setAtivo(
+                        bd.rs.getBoolean("ativo")
+                );
+
+                return b;
+            }
+
+            return null;
+
+        } catch(SQLException e) {
+
+            throw new IllegalArgumentException(
+                    "Erro ao buscar beneficiário: "
+                    + e.getMessage()
+            );
+
+        } finally {
+
+            bd.close();
+        }
+    }
+    
+    /**
      * Registra o recebimento de uma doação pelo beneficiário.
      * Valida se o beneficiário está ativo e se a doação não é nula ou duplicada.
      *
@@ -385,6 +453,78 @@ public class Beneficiario {
         }
 
         return cpf;
+    }
+    
+    /**
+     * Atualiza os dados de um beneficiário
+     * @param beneficiario Beneficiário a ser atualizado
+     */
+    public static void atualizarBeneficiario(
+            Beneficiario beneficiario
+    ) {
+
+        BD bd = new BD();
+
+        try {
+
+            bd.getConnection();
+
+            String sql =
+                    "UPDATE sgd.beneficiario " +
+                    "SET nome = ?, " +
+                    "telefone = ?, " +
+                    "endereco = ?, " +
+                    "membros_familia = ?, " +
+                    "ativo = ? " +
+                    "WHERE id_beneficiario = ?";
+
+            bd.st =
+                    bd.con.prepareStatement(sql);
+
+            bd.st.setString(
+                    1,
+                    beneficiario.getNome()
+            );
+
+            bd.st.setString(
+                    2,
+                    beneficiario.getTelefone()
+            );
+
+            bd.st.setString(
+                    3,
+                    beneficiario.getEndereco()
+            );
+
+            bd.st.setInt(
+                    4,
+                    beneficiario.getMembrosFamilia()
+            );
+
+            bd.st.setBoolean(
+                    5,
+                    beneficiario.isAtivo()
+            );
+
+            bd.st.setInt(
+                    6,
+                    beneficiario.getId()
+            );
+
+            bd.st.executeUpdate();
+
+        }
+        catch(SQLException e) {
+
+            throw new IllegalArgumentException(
+                    "Erro ao atualizar beneficiário: "
+                    + e.getMessage()
+            );
+        }
+        finally {
+
+            bd.close();
+        }
     }
     
     /**

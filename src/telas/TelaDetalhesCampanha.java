@@ -24,6 +24,14 @@ public class TelaDetalhesCampanha
 
     private DefaultTableModel modelo;
 
+    private JCheckBox chkAtiva;
+
+    private JCheckBox chkDinheiro;
+
+    private JCheckBox chkAgasalho;
+
+    private JCheckBox chkAlimento;
+    
     public TelaDetalhesCampanha(
             Usuario usuario,
             Campanha campanha
@@ -105,6 +113,88 @@ public class TelaDetalhesCampanha
         );
 
         add(resumo);
+        
+        if(usuario.isAdministrador()) {
+
+            chkAtiva = new JCheckBox("Campanha Ativa");
+
+            chkAtiva.setBounds(
+                    30,
+                    105,
+                    150,
+                    25
+            );
+
+            chkAtiva.setSelected(
+                    campanha.isAtiva()
+            );
+
+            chkAtiva.setBackground(PAINEL);
+
+            chkAtiva.setForeground(TEXTO);
+
+            add(chkAtiva);
+
+
+            chkDinheiro = new JCheckBox("Aceita Dinheiro");
+
+            chkDinheiro.setBounds(
+                    190,
+                    105,
+                    150,
+                    25
+            );
+
+            chkDinheiro.setSelected(
+                    campanha.isAceitaDinheiro()
+            );
+
+            chkDinheiro.setBackground(PAINEL);
+
+            chkDinheiro.setForeground(TEXTO);
+
+            add(chkDinheiro);
+
+
+            chkAgasalho = new JCheckBox("Aceita Agasalho");
+
+            chkAgasalho.setBounds(
+                    360,
+                    105,
+                    150,
+                    25
+            );
+
+            chkAgasalho.setSelected(
+                    campanha.isAceitaAgasalho()
+            );
+
+            chkAgasalho.setBackground(PAINEL);
+
+            chkAgasalho.setForeground(TEXTO);
+
+            add(chkAgasalho);
+
+
+            chkAlimento = new JCheckBox("Aceita Alimento");
+
+            chkAlimento.setBounds(
+                    530,
+                    105,
+                    150,
+                    25
+            );
+
+            chkAlimento.setSelected(
+                    campanha.isAceitaAlimento()
+            );
+
+            chkAlimento.setBackground(PAINEL);
+
+            chkAlimento.setForeground(TEXTO);
+
+            add(chkAlimento);
+        }
 
         modelo =
                 new DefaultTableModel();
@@ -139,20 +229,41 @@ public class TelaDetalhesCampanha
 
         scroll.setBounds(
                 30,
-                120,
+                150,
                 820,
-                320
+                290
         );
 
         add(scroll);
 
+        if(usuario.isAdministrador()) {
+
+            BotaoPadrao btnSalvar =
+                    new BotaoPadrao(
+                            "Salvar Alterações"
+                    );
+
+            btnSalvar.setBounds(
+                    120,
+                    470,
+                    180,
+                    40
+            );
+
+            btnSalvar.addActionListener(
+                    e -> salvarAlteracoes()
+            );
+
+            add(btnSalvar);
+        }
+        
         BotaoPadrao btnFechar =
                 new BotaoPadrao(
                         "Fechar"
                 );
 
         btnFechar.setBounds(
-                330,
+                520,
                 470,
                 180,
                 40
@@ -226,6 +337,42 @@ public class TelaDetalhesCampanha
 
                             valor
                     }
+            );
+        }
+    }
+    
+    private void salvarAlteracoes() {
+
+        try {
+
+            campanha.setAtiva(
+                    chkAtiva.isSelected()
+            );
+
+            campanha.setAceitaDinheiro(
+                    chkDinheiro.isSelected()
+            );
+
+            campanha.setAceitaAgasalho(
+                    chkAgasalho.isSelected()
+            );
+
+            campanha.setAceitaAlimento(
+                    chkAlimento.isSelected()
+            );
+
+            campanha.atualizarCampanha();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Campanha atualizada com sucesso!"
+            );
+        }
+        catch(Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage()
             );
         }
     }

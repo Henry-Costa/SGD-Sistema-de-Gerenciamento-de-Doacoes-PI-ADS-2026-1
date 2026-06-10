@@ -82,7 +82,18 @@ public class TelaDoadores extends TelaBase {
          * TABELA
          */
 
-        modeloTabela = new DefaultTableModel();
+        modeloTabela = new DefaultTableModel() {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(
+                    int row,
+                    int column
+            ) {
+                return false;
+            }
+        };
 
         modeloTabela.addColumn("Nome");
 
@@ -93,6 +104,45 @@ public class TelaDoadores extends TelaBase {
         modeloTabela.addColumn("Documento");
 
         tabela = new JTable(modeloTabela);
+        
+        tabela.addMouseListener(
+        	    new java.awt.event.MouseAdapter() {
+
+        	        @Override
+        	        public void mouseClicked(
+        	                java.awt.event.MouseEvent e
+        	        ) {
+
+        	            if(e.getClickCount() == 2) {
+
+        	                int linha =
+        	                        tabela.getSelectedRow();
+
+        	                if(linha >= 0) {
+
+        	                    String documento =
+        	                            tabela.getValueAt(
+        	                                    linha,
+        	                                    3
+        	                            ).toString();
+
+        	                    Doador doador =
+        	                            Doador.buscarPorDocumento(
+        	                                    documento
+        	                            );
+
+        	                    if(doador != null) {
+
+        	                        new TelaDetalhesDoador(
+        	                                usuario,
+        	                                doador
+        	                        ).setVisible(true);
+        	                    }
+        	                }
+        	            }
+        	        }
+        	    }
+        	);
 
         JScrollPane scroll =
                 new JScrollPane(tabela);

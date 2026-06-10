@@ -203,31 +203,31 @@ public class TelaMenu extends TelaBase {
         painelMenu.add(btnDoacoes);
 
         /*
-         * BOTÃO CADASTRAR USUÁRIO
+         * BOTÃO USUÁRIOS
          */
 
         if(usuario.isAdministrador()) {
 
-            BotaoPadrao btnCadastrarUsuario =
-                    new BotaoPadrao("Cadastrar Usuário");
+            BotaoPadrao btnUsuarios =
+                    new BotaoPadrao("Usuários");
 
-            btnCadastrarUsuario.setBounds(
+            btnUsuarios.setBounds(
                     155,
                     165,
                     200,
                     40
             );
 
-            btnCadastrarUsuario.addActionListener(e -> {
+            btnUsuarios.addActionListener(e -> {
 
                 dispose();
 
-                new TelaCadastroUsuario(usuario)
+                new TelaUsuarios(usuario)
                         .setVisible(true);
 
             });
 
-            painelMenu.add(btnCadastrarUsuario);
+            painelMenu.add(btnUsuarios);
         }
 
         /*
